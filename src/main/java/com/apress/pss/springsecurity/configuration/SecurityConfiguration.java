@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
@@ -30,16 +31,26 @@ public class SecurityConfiguration extends
                 .withUser("admin").password(passwordEncoder.encode("admin123")).roles("USER",
                 "ADMIN");
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public AuthenticationFailureHandler customAuthenticationFailureHandler(){
+        return new CustomAuthenticationFailureHandle();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/", "/welcome", "/login").permitAll()
-                .antMatchers("/authenticated/**").hasAnyRole("ADMIN", "USER")
-                .and().formLogin()
+//                .antMatchers("/authenticated/**").hasAnyRole("ADMIN", "USER")
+//                .anyRequest().authenticated()
+                .antMatchers("/**").hasRole("ADMIN")
+                .and().formLogin().loginPage("/login").permitAll()
+                    .failureHandler(customAuthenticationFailureHandler()) //(new CustomAuthenticationFailureHandle())
                 .and().logout().logoutSuccessUrl("/welcome").permitAll()
                 .and().csrf().disable();
     }

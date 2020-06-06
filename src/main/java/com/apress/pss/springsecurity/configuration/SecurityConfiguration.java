@@ -49,8 +49,9 @@ public class SecurityConfiguration extends
 //                .antMatchers("/authenticated/**").hasAnyRole("ADMIN", "USER")
 //                .anyRequest().authenticated()
                 .antMatchers("/**").hasRole("ADMIN")
-                .and().formLogin().loginPage("/login").permitAll()
-                    .failureHandler(customAuthenticationFailureHandler()) //(new CustomAuthenticationFailureHandle())
+                //.and().formLogin().loginPage("/login").permitAll()
+                .and().httpBasic()
+                    //.failureHandler(customAuthenticationFailureHandler()) //(new CustomAuthenticationFailureHandle())
                 .and().logout().logoutSuccessUrl("/welcome").permitAll()
                 .and().csrf().disable();
     }
